@@ -8,16 +8,17 @@ minX即为本题的答案。我们可以用二分法查找minX。对于每一次
 class Solution {
 public:
     int shipWithinDays(vector<int>& weights, int days) {
-        int left = 0, right = 0;
+        //二分查找
+        int left = 0, right = 0;//左边界为max(weights)，即每天只运送一个包裹, 右边界为sum(weights), 即一天运送所有包裹。
         for (int weight : weights) {
             left = max(left, weight);
             right += weight;
         }
         while (left < right) {
             int mid = (left + right) / 2;
-            if (validate(weights, days, mid)) {
+            if (validate(weights, days, mid)) {//判定mid是否合法，若合法，则minX在 [left, mid] 内
                 right = mid;
-            } else {
+            } else {//若不合法，则minX在 [mid + 1, right] 内
                 left = mid + 1;
             }
         }
@@ -28,9 +29,9 @@ private:
         int day = 1;
         int load = 0;
         for (int weight : weights) {
-            if (load + weight <= size) {
+            if (load + weight <= size) {//小于size则可以一天运完
                 load += weight;
-            } else {
+            } else {//大于size下一天运
                 day++;
                 load = weight;
             }
@@ -42,8 +43,10 @@ private:
 复杂度分析：  
 时间复杂度 O(nlogw)：其中n是数组weights的长度，w是数组weights中元素的和。二分查找需要查找的次数为O(logw)，每次查找时进行判定需要遍历数组weights一次。  
 空间复杂度 O(1)：没有使用新的数组，因此只需要常数的空间。  
-***  
-1012. 搜索二维矩阵  
+  
+******  
+  
+74. 搜索二维矩阵  
 方法一：两次二分查找  
 思路：  
 由于每行元素从左到右升序排列，且每行第一个整数大于前一行的最后一个整数，因此该矩阵第一列元素从上至下升序排列。  
@@ -54,23 +57,23 @@ class Solution {
 public:
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
         if (matrix[0][0] == target) return true;
-        int left = 0, right = matrix.size() - 1;
+        int left = 0, right = matrix.size() - 1;//从第一行到最后一行内查找，左边界为数组下标初始位置0，右边界为二维数组的行数
         while (left < right) {
             int mid = (left + right + 1) / 2;
-            if (matrix[mid][0] <= target) {
+            if (matrix[mid][0] <= target) {//小于等于target在mid右边界查找，mid自己也可能是答案
                 left = mid;
-            } else {
+            } else {//大于target在mid左边界查找
                 right = mid - 1;
             }
         }
-        int m = right;
-        left = 0, right = matrix[0].size() - 1;
+        int row = right;
+        left = 0, right = matrix[0].size() - 1;//从第一列到最后一列内查找，左边界为数组下标初始位置0，右边界为二维数组的列数
         while (left <= right) {
             int mid = (left + right) / 2;
-            if (matrix[m][mid] == target) return true;
-            if (matrix[m][mid] > target) {
+            if (matrix[row][mid] == target) return true;//找到target返回true
+            if (matrix[row][mid] > target) {//大于target在mid的左侧 [left, mid - 1] 内查找
                 right = mid - 1;
-            } else {
+            } else {//小于target在mid的右侧 [mid + 1, right] 内查找
                 left = mid + 1;
             }
         }
@@ -92,13 +95,13 @@ public:
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
         if (matrix[0][0] == target) return true;
         int row = matrix.size(), col = matrix[0].size();
-        int left = 0, right = row*col - 1;
+        int left = 0, right = row*col - 1;//在所有元素中查找，左侧为数组下标初始位置0，右侧为二维数组中元素的个数
         while (left <= right) {
             int mid = (left + right) / 2;
-            if (matrix[mid / col][mid % col] == target) return true;
-            if (matrix[mid / col][mid % col] > target) {
+            if (matrix[mid / col][mid % col] == target) return true;//找到target返回true
+            if (matrix[mid / col][mid % col] > target) {//大于target在mid的左侧 [left, mid - 1] 内查找
                 right = mid - 1;
-            } else {
+            } else {//小于target在mid的右侧 [mid + 1, right] 内查找
                 left = mid + 1;
             }
         }
